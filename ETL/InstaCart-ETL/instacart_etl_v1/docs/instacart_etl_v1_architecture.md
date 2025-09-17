@@ -1,0 +1,6 @@
+This document outlines the architecture flow of the project instacart_etl_v1.
+
+# Architecture flow
+to be updated...
+# High level principles
+to be updated...

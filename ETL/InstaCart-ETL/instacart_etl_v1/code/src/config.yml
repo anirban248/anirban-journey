@@ -1,0 +1,21 @@
+# Environment and catalog settings
+environment: "development"
+catalog: "data_engineering"
+schema: "instacart_pipeline"
+# Configuration file for path settings
+volume_for_files:
+  vol_name: "files"
+  raw_files: "raw"
+  processed_files: "processed"
+volume_for_processing:
+  vol_name: "ingest"
+  checkpoint_location: "checkpoint"
+  log_location: "logs"
+
+file_settings:
+  encoding: "utf-8"
+
+# Optional: Additional configuration
+metadata:
+  created_by: "Anirban"
+  version: "1.0"
