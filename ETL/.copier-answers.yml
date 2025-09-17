@@ -1,0 +1,8 @@
+# Changes here will be overwritten by Copier
+_src_path: D:\Study\code\anir248_learn\copier_template
+author_email: anirban248@live.com
+author_name: Anirban Banerjee
+contracts: true
+module_name: main
+project_name: instacart_etl_v2
+tests: true
