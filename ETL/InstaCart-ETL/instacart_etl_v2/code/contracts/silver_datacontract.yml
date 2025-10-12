@@ -1,0 +1,72 @@
+dataContractSpecification: 0.9.2
+id: instacart-databricks
+info:
+  title: Instacart Dataset
+  version: 1.0.0
+  description: |
+    Data contract for Instacart public dataset files ingested into Delta Lake tables on Databricks.
+owners:
+  name: Anirban Banerjee
+  email: anirban248@live.com
+servers:
+  development:
+    type: databricks
+    host: https://dbc-ad0b4e75-da07.cloud.databricks.com/
+    catalog: data_engineering
+    schema: instacart_pipeline
+models:
+  dim_products:
+    type: table
+    description: product dimension with respective aisle and departments.
+    fields:
+      product_id:
+        type: int
+      product_name:
+        type: string
+      aisle_id:
+        type: int
+      aisle_name:
+        type: string
+      department_id:
+        type: int
+      department:
+        type: string
+      created_date:
+        type: timestamp
+      last_modified_date:
+        type: timestamp
+      product_hash_key:
+        type: string
+  fct_orders:
+    type: table
+    description: Prior order-product mappings
+    fields:
+      order_id:
+        type: int
+      product_id:
+        type: int
+      user_id:
+        type: int
+      order_number:
+        type: int
+      order_dow:
+        type: int
+      order_hour_of_day:
+        type: int
+      days_since_prior_order:
+        type: double
+      add_to_cart_order:
+        type: int
+      reordered:
+        type: int
+      created_date:
+        type: timestamp
+      last_modified_date:
+        type: timestamp
+      order_hash_key:
+        type: string
+    quality:
+      - type: sql
+        description: Ensure no nulls in product_id
+        query: SELECT COUNT(*) FROM data_engineering.instacart_pipeline.fct_orders WHERE product_id IS NULL
+        mustBe: 0

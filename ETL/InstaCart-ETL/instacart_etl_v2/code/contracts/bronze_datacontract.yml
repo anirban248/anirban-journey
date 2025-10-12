@@ -1,0 +1,87 @@
+dataContractSpecification: 0.9.2
+id: instacart-databricks
+info:
+  title: Instacart Dataset
+  version: 1.0.0
+  description: |
+    Data contract for Instacart public dataset files ingested into Delta Lake tables on Databricks.
+owners:
+  name: Anirban Banerjee
+  email: anirban248@live.com
+servers:
+  development:
+    type: databricks
+    host: https://dbc-ad0b4e75-da07.cloud.databricks.com/
+    catalog: data_engineering
+    schema: instacart_pipeline
+models:
+  orders:
+    type: table
+    description: Orders placed by customers.
+    fields:
+      order_id:
+        type: int
+      user_id:
+        type: int
+      eval_set:
+        type: string
+      order_number:
+        type: int
+      order_dow:
+        type: int
+      order_hour_of_day:
+        type: int
+      days_since_prior_order:
+        type: double
+  products:
+    type: table
+    description: Product catalog.
+    fields:
+      product_id:
+        type: int
+      product_name:
+        type: string
+      aisle_id:
+        type: int
+      department_id:
+        type: int
+  aisles:
+    type: table
+    description: Grocery aisles.
+    fields:
+      aisle_id:
+        type: int
+      aisle:
+        type: string
+  departments:
+    type: table
+    description: Product departments
+    fields:
+      department_id:
+        type: int
+      department:
+        type: string
+  order_products__prior:
+    type: table
+    description: Prior order-product mappings
+    fields:
+      order_id:
+        type: int
+      product_id:
+        type: int
+      add_to_cart_order:
+        type: int
+      reordered:
+        type: int
+  order_products__train:
+    type: table
+    description: Training set order-product mappings.
+    fields:
+      order_id:
+        type: int
+      product_id:
+        type: int
+      add_to_cart_order:
+        type: int
+      reordered:
+        type: int
