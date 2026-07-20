@@ -1,0 +1,58 @@
+name: Block Merge if folder2 Modified
+
+on:
+  pull_request:
+    paths:
+      - 'folder1/**'
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'folder1/**'
+
+jobs:
+  check_folder2_changes:
+    runs-on: ubuntu-latest
+    name: Verify folder2 is not modified
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes in folder2
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # For pull requests, check diff against base branch
+            git diff --name-only origin/${{ github.base_ref }} HEAD | grep -q "^folder2/" && {
+              echo "❌ Error: Changes detected in folder2"
+              echo "folder2 is protected and cannot be modified in this PR"
+              exit 1
+            } || echo "✅ No changes in folder2"
+          else
+            # For push events, check against previous commit
+            git diff --name-only HEAD~1 HEAD | grep -q "^folder2/" && {
+              echo "❌ Error: Changes detected in folder2"
+              echo "folder2 is protected and cannot be modified"
+              exit 1
+            } || echo "✅ No changes in folder2"
+          fi
+
+  validate_folder1_changes:
+    runs-on: ubuntu-latest
+    name: Validate folder1 modifications
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Confirm folder1 has changes
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git diff --name-only origin/${{ github.base_ref }} HEAD | grep -q "^folder1/" && {
+              echo "✅ folder1 modifications detected"
+            } || {
+              echo "⚠️  No changes detected in folder1"
+            }
+          fi
+
