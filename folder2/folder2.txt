@@ -1,1 +1,0 @@
-this is initial content of folder2.txt file.
