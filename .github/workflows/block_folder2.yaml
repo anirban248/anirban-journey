@@ -1,55 +1,58 @@
-name: Block Merge if folder2 Modified
+name: Block Multi-Area Changes
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    paths:
-      - 'folder1/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  check_folder2_changes:
+  validate_single_area_changes:
     runs-on: ubuntu-latest
-    name: Verify folder2 is not modified
+    name: Ensure PR touches only one area (frontend OR backend)
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Check for changes in folder2
+      - name: Check for changes in both folder1 and folder2
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            # For pull requests, check diff against base branch
-            git diff --name-only origin/${{ github.base_ref }} HEAD | grep -q "^folder2/" && {
-              echo "❌ Error: Changes detected in folder2"
-              echo "folder2 is protected and cannot be modified in this PR"
-              exit 1
-            } || echo "✅ No changes in folder2"
+          echo "🔍 Analyzing PR changes..."
+          echo ""
+          
+          # Get list of changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          
+          # Check if folder1 was modified
+          FOLDER1_CHANGED=$(echo "$CHANGED_FILES" | grep -c "^folder1/" || true)
+          
+          # Check if folder2 was modified
+          FOLDER2_CHANGED=$(echo "$CHANGED_FILES" | grep -c "^folder2/" || true)
+          
+          echo "Files changed in folder1 (Frontend): $FOLDER1_CHANGED"
+          echo "Files changed in folder2 (Backend): $FOLDER2_CHANGED"
+          echo ""
+          
+          # Block if both areas are modified
+          if [ $FOLDER1_CHANGED -gt 0 ] && [ $FOLDER2_CHANGED -gt 0 ]; then
+            echo "❌ ERROR: This PR modifies BOTH frontend (folder1) and backend (folder2)"
+            echo ""
+            echo "❌ Pull requests must modify only ONE area at a time"
+            echo ""
+            echo "📖 For detailed instructions on how to fix this, see:"
+            echo "   .github/TROUBLESHOOTING.md"
+            echo ""
+            echo "✅ Quick Solution: Split this PR into two separate PRs:"
+            echo "   1. One PR for frontend (folder1) changes only"
+            echo "   2. One PR for backend (folder2) changes only"
+            echo ""
+            echo "This ensures cleaner code reviews and easier debugging"
+            exit 1
+          elif [ $FOLDER1_CHANGED -gt 0 ]; then
+            echo "✅ PASS: This PR contains only frontend (folder1) changes"
+          elif [ $FOLDER2_CHANGED -gt 0 ]; then
+            echo "✅ PASS: This PR contains only backend (folder2) changes"
           else
-            # For push events, check against previous commit
-            git diff --name-only HEAD~1 HEAD | grep -q "^folder2/" && {
-              echo "❌ Error: Changes detected in folder2"
-              echo "folder2 is protected and cannot be modified"
-              exit 1
-            } || echo "✅ No changes in folder2"
-          fi
-
-  validate_folder1_changes:
-    runs-on: ubuntu-latest
-    name: Validate folder1 modifications
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Confirm folder1 has changes
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            git diff --name-only origin/${{ github.base_ref }} HEAD | grep -q "^folder1/" && {
-              echo "✅ folder1 modifications detected"
-            } || {
-              echo "⚠️  No changes detected in folder1"
-            }
+            echo "ℹ️  This PR doesn't modify folder1 or folder2"
+            echo "✅ PASS: Other changes are allowed"
           fi
 
