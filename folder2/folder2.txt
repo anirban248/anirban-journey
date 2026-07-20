@@ -1,1 +1,2 @@
 this is initial content of folder2.txt
+adding a line to fail PR
