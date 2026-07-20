@@ -1,1 +1,2 @@
 This is initial content of folder1.txt file.
+**this is a new line added to the file and now has folder2 changes as well in this commit**
