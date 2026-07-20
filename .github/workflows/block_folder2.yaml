@@ -1,9 +1,6 @@
 name: Block Merge if folder2 Modified
 
 on:
-  pull_request:
-    paths:
-      - 'folder1/**'
   push:
     branches:
       - main
